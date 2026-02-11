@@ -42,6 +42,41 @@ async function initializeTimestamps() {
   await saveTimestamps(tabTimestamps);
 }
 
+// --- Badge ---
+
+const ONE_HOUR = 60 * 60 * 1000;
+
+async function updateBadge() {
+  const { tabTimestamps, settings } = await getStorageData();
+  const maxAge = (settings.maxAgeDays ?? DEFAULT_SETTINGS.maxAgeDays) * 24 * 60 * 60 * 1000;
+  const now = Date.now();
+  const tabs = await browser.tabs.query({});
+
+  const protectedUrls = new Set();
+  for (const tab of tabs) {
+    if (tab.active || tab.pinned) {
+      if (tab.url) protectedUrls.add(tab.url);
+    }
+  }
+
+  let atRisk = 0;
+  for (const tab of tabs) {
+    if (tab.pinned || tab.active) continue;
+    if (tab.url && protectedUrls.has(tab.url)) continue;
+    const lastActive = tabTimestamps[tab.id];
+    if (lastActive === undefined) continue;
+    const remaining = maxAge - (now - lastActive);
+    if (remaining > 0 && remaining <= ONE_HOUR) atRisk++;
+  }
+
+  if (atRisk > 0) {
+    browser.browserAction.setBadgeText({ text: String(atRisk) });
+    browser.browserAction.setBadgeBackgroundColor({ color: "#e05565" });
+  } else {
+    browser.browserAction.setBadgeText({ text: "" });
+  }
+}
+
 // --- Sweep ---
 
 async function sweep() {
@@ -85,17 +120,20 @@ async function sweep() {
   }
 
   await saveTimestamps(tabTimestamps);
+  await updateBadge();
 }
 
 // --- Event listeners ---
 
 browser.runtime.onInstalled.addListener(async () => {
   await initializeTimestamps();
+  await updateBadge();
   browser.alarms.create(ALARM_NAME, { periodInMinutes: ALARM_PERIOD_MINUTES });
 });
 
 browser.runtime.onStartup.addListener(async () => {
   await initializeTimestamps();
+  await updateBadge();
   // Ensure alarm exists after restart
   const existing = await browser.alarms.get(ALARM_NAME);
   if (!existing) {
@@ -124,6 +162,7 @@ browser.tabs.onActivated.addListener(async (activeInfo) => {
   }
 
   await saveTimestamps(tabTimestamps);
+  await updateBadge();
 });
 
 browser.tabs.onRemoved.addListener(async (tabId) => {

@@ -40,6 +40,16 @@ zen-closer/
 │   ├── popup.js       # Tab list rendering, settings
 │   └── popup.css      # Styles (dark/light mode)
 └── icons/
+    ├── icon.svg       # Source icon (editable)
     ├── icon-48.png    # Toolbar icon
     └── icon-96.png    # High-DPI toolbar icon
+```
+
+## Regenerating Icons
+
+After editing `icons/icon.svg`, regenerate the PNGs with [librsvg](https://wiki.gnome.org/Projects/LibRsvg):
+
+```sh
+rsvg-convert -w 48 -h 48 icons/icon.svg -o icons/icon-48.png
+rsvg-convert -w 96 -h 96 icons/icon.svg -o icons/icon-96.png
 ```
