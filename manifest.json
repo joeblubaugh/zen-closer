@@ -1,0 +1,26 @@
+{
+  "manifest_version": 2,
+  "name": "Zen Tab Auto-Closer",
+  "version": "1.0.0",
+  "description": "Automatically closes tabs inactive for a configurable number of days.",
+  "permissions": [
+    "tabs",
+    "alarms",
+    "storage"
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": true
+  },
+  "browser_action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "48": "icons/icon-48.png",
+      "96": "icons/icon-96.png"
+    }
+  },
+  "icons": {
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png"
+  }
+}

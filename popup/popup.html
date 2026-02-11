@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Zen Tab Closer</h1>
+
+    <div id="tab-list" class="tab-list"></div>
+
+    <div class="settings">
+      <label for="max-age">Close tabs inactive for
+        <input type="number" id="max-age" min="0.001" step="0.5" value="7">
+        days
+      </label>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
