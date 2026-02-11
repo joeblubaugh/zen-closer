@@ -50,6 +50,22 @@ h1 {
   margin-bottom: 10px;
 }
 
+.search {
+  width: 100%;
+  padding: 6px 10px;
+  margin-bottom: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 13px;
+  outline: none;
+}
+
+.search:focus {
+  border-color: var(--accent);
+}
+
 .tab-list {
   display: flex;
   flex-direction: column;

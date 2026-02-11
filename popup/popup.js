@@ -27,6 +27,7 @@ async function render() {
   const tabs = await browser.tabs.query({});
   const now = Date.now();
   const maxAgeMs = settings.maxAgeDays * 24 * 60 * 60 * 1000;
+  const query = document.getElementById("search").value.toLowerCase();
 
   // Build list sorted by idle time descending (oldest first)
   const entries = tabs.map((tab) => {
@@ -40,6 +41,12 @@ async function render() {
   list.innerHTML = "";
 
   for (const { tab, idle } of entries) {
+    // Filter by search query against title and URL
+    if (query) {
+      const title = (tab.title || "").toLowerCase();
+      const url = (tab.url || "").toLowerCase();
+      if (!title.includes(query) && !url.includes(query)) continue;
+    }
     const row = document.createElement("div");
     row.className = "tab-row";
 
@@ -97,6 +104,8 @@ async function render() {
   // Settings
   document.getElementById("max-age").value = settings.maxAgeDays;
 }
+
+document.getElementById("search").addEventListener("input", () => render());
 
 document.getElementById("max-age").addEventListener("change", async (e) => {
   const value = parseFloat(e.target.value);
