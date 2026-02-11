@@ -51,9 +51,18 @@ async function sweep() {
   const tabs = await browser.tabs.query({});
   const currentTabIds = new Set(tabs.map((t) => t.id));
 
+  // Build a set of URLs that have an active or pinned tab somewhere
+  const protectedUrls = new Set();
+  for (const tab of tabs) {
+    if (tab.active || tab.pinned) {
+      if (tab.url) protectedUrls.add(tab.url);
+    }
+  }
+
   for (const tab of tabs) {
     if (tab.pinned) continue;
     if (tab.active) continue;
+    if (tab.url && protectedUrls.has(tab.url)) continue;
 
     const lastActive = tabTimestamps[tab.id];
     if (lastActive === undefined) continue;
@@ -102,7 +111,18 @@ browser.tabs.onCreated.addListener(async (tab) => {
 
 browser.tabs.onActivated.addListener(async (activeInfo) => {
   const { tabTimestamps } = await getStorageData();
-  tabTimestamps[activeInfo.tabId] = Date.now();
+  const now = Date.now();
+  tabTimestamps[activeInfo.tabId] = now;
+
+  // Also reset timestamps for all tabs with the same URL (Zen synced tabs)
+  const activatedTab = await browser.tabs.get(activeInfo.tabId);
+  if (activatedTab.url) {
+    const siblings = await browser.tabs.query({ url: activatedTab.url });
+    for (const sib of siblings) {
+      tabTimestamps[sib.id] = now;
+    }
+  }
+
   await saveTimestamps(tabTimestamps);
 });
 
