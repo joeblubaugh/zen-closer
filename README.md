@@ -53,3 +53,9 @@ After editing `icons/icon.svg`, regenerate the PNGs with [librsvg](https://wiki.
 rsvg-convert -w 48 -h 48 icons/icon.svg -o icons/icon-48.png
 rsvg-convert -w 96 -h 96 icons/icon.svg -o icons/icon-96.png
 ```
+
+## Integration Tests
+
+Install the test requirements with `npm install`
+
+Run the tests with `node test.js`
