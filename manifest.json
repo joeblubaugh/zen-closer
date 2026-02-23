@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Zen Tab Auto-Closer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Automatically closes tabs inactive for a configurable number of days.",
   "permissions": [
     "tabs",

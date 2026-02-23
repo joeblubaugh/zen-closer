@@ -41,6 +41,7 @@ async function render() {
   list.innerHTML = "";
 
   for (const { tab, idle } of entries) {
+    if (tab.url === "about:blank") continue;
     // Filter by search query against title and URL
     if (query) {
       const title = (tab.title || "").toLowerCase();

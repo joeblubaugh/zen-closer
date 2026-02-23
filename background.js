@@ -62,6 +62,7 @@ async function updateBadge() {
   let atRisk = 0;
   for (const tab of tabs) {
     if (tab.pinned || tab.active) continue;
+    if (tab.url === "about:blank") continue;
     if (tab.url && protectedUrls.has(tab.url)) continue;
     const lastActive = tabTimestamps[tab.id];
     if (lastActive === undefined) continue;
@@ -97,6 +98,7 @@ async function sweep() {
   for (const tab of tabs) {
     if (tab.pinned) continue;
     if (tab.active) continue;
+    if (tab.url === "about:blank") continue;
     if (tab.url && protectedUrls.has(tab.url)) continue;
 
     const lastActive = tabTimestamps[tab.id];
