@@ -125,6 +125,17 @@ async function sweep() {
   await updateBadge();
 }
 
+// --- Window switch detection ---
+
+let lastWindowFocusTime = 0;
+const WINDOW_SWITCH_GRACE_MS = 500;
+
+browser.windows.onFocusChanged.addListener((windowId) => {
+  if (windowId !== browser.windows.WINDOW_ID_NONE) {
+    lastWindowFocusTime = Date.now();
+  }
+});
+
 // --- Event listeners ---
 
 browser.runtime.onInstalled.addListener(async () => {
@@ -150,8 +161,13 @@ browser.tabs.onCreated.addListener(async (tab) => {
 });
 
 browser.tabs.onActivated.addListener(async (activeInfo) => {
-  const { tabTimestamps } = await getStorageData();
   const now = Date.now();
+
+  // Skip timestamp reset if this activation was triggered by a window switch.
+  // The tab was already active in that window — the user didn't deliberately switch to it.
+  if (now - lastWindowFocusTime < WINDOW_SWITCH_GRACE_MS) return;
+
+  const { tabTimestamps } = await getStorageData();
   tabTimestamps[activeInfo.tabId] = now;
 
   // Also reset timestamps for all tabs with the same URL (Zen synced tabs)
